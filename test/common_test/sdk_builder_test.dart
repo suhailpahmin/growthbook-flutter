@@ -94,6 +94,25 @@ void main() {
       manager.clearCache();
     });
 
+    test('- feature() reads the same key consistently', () async {
+      await manager.clearCache();
+      GrowthBookSDK sdk = await GBSDKBuilderApp(
+        apiKey: testApiKey,
+        hostURL: testHostURL,
+        attributes: attr,
+        client: const MockNetworkClient(error: true),
+        growthBookTrackingCallBack: (trackData) {},
+        gbFeatures: {'repeat-feature': GBFeature(defaultValue: true)},
+        backgroundSync: false,
+      ).setRefreshHandler((refreshHandler) {}).initialize();
+      final first = sdk.feature('repeat-feature');
+      final second = sdk.feature('repeat-feature');
+      expect(first.on, true);
+      expect(second.on, true);
+      expect(second.source, isNot(GBFeatureSource.cyclicPrerequisite));
+      manager.clearCache();
+    });
+
     test(
       '- with failed network client',
       () async {

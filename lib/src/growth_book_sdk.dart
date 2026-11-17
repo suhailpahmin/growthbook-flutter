@@ -251,6 +251,8 @@ class GrowthBookSDK extends FeaturesFlowDelegate {
 
   GBFeatureResult feature(String id) {
     _featureViewModel.fetchFeatures(context.getFeaturesURL());
+    // Clear stack context to avoid false cyclic prerequisite detection on repeat reads
+    _evaluationContext.stackContext.evaluatedFeatures.clear();
     return FeatureEvaluator().evaluateFeature(_evaluationContext, id);
   }
 
